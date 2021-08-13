@@ -15,15 +15,23 @@ namespace FractalPainting.App
 {
     public class ImageSettingsAction : IUiAction
     {
+        private readonly ImageSettings _imageSettings;
+        private readonly IImageHolder _pictureBoxImageHolder;
+
+        public ImageSettingsAction(ImageSettings imageSettings, IImageHolder pictureBoxImageHolder)
+        {
+            _imageSettings = imageSettings;
+            _pictureBoxImageHolder = pictureBoxImageHolder;
+        }
+
         public MenuCategory Category => MenuCategory.Settings;
         public string Name => "Изображение...";
         public string Description => "Размеры изображения";
 
         public void Perform()
         {
-            var imageSettings = Services.GetImageSettings();
-            SettingsForm.For(imageSettings).ShowDialog();
-            Services.GetImageHolder().RecreateImage(imageSettings);
+            SettingsForm.For(_imageSettings).ShowDialog();
+            _pictureBoxImageHolder.RecreateImage(_imageSettings);
         }
     }
 
@@ -70,7 +78,7 @@ namespace FractalPainting.App
                     new SaveImageAction(),
                     new DragonFractalAction(),
                     new KochFractalAction(),
-                    new ImageSettingsAction(),
+                    new ImageSettingsAction(Services.GetImageSettings(), Services.GetImageHolder()),
                     new PaletteSettingsAction()
                 }, Services.GetPictureBoxImageHolder())
         { }
