@@ -15,16 +15,15 @@ namespace FractalPainting.App
     {
         public static MainForm CreateMainForm()
         {
-            // Example: ConfigureContainer()...
-            return new MainForm();
+            var container = ConfigureContainer();
+
+            return container.Get<MainForm>();
         }
 
         public static StandardKernel ConfigureContainer()
         {
             var container = new StandardKernel();
-
-            // Example
-            // container.Bind<TService>().To<TImplementation>();
+            container.Bind<MainForm>().ToConstant(new MainForm());
 
             return container;
         }
