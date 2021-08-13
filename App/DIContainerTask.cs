@@ -23,13 +23,7 @@ namespace FractalPainting.App
         public static StandardKernel ConfigureContainer()
         {
             var container = new StandardKernel();
-            container.Bind<MainForm>().ToConstant(new MainForm());
 
-            //Произведите биндинг всех классов унаследованных от IUiAction
-            //А все зависимости для 
-            //инициализации Action - объектов временно забиндите на обращение к 
-            //классу Services через метод ToConstant. Все биндинги должны быть 
-            //в методе ConfigureContainer.
             container.Bind<IUiAction>().To<KochFractalAction>();
             container.Bind<IUiAction>().To<DragonFractalAction>();
 
@@ -39,10 +33,11 @@ namespace FractalPainting.App
 
             container.Bind<IUiAction>().To<ImageSettingsAction>();
             container.Bind<ImageSettings>().ToConstant(Services.GetImageSettings());
-            container.Bind<IImageHolder>().ToConstant(Services.GetImageHolder());
 
             container.Bind<IUiAction>().To<PaletteSettingsAction>();
             container.Bind<Palette>().ToConstant(Services.GetPalette());
+
+            container.Bind<PictureBoxImageHolder>().ToConstant(Services.GetPictureBoxImageHolder());
 
             return container;
         }
