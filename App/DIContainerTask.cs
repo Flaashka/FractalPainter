@@ -25,7 +25,6 @@ namespace FractalPainting.App
             var container = new StandardKernel();
 
             container.Bind<IUiAction>().To<KochFractalAction>();
-            container.Bind<KochPainter>().ToSelf();
             container.Bind<IUiAction>().To<DragonFractalAction>();
 
             container.Bind<IUiAction>().To<SaveImageAction>();
@@ -39,7 +38,6 @@ namespace FractalPainting.App
             container.Bind<Palette>().ToConstant(Services.GetPalette());
 
             container.Bind<PictureBoxImageHolder>().ToConstant(Services.GetPictureBoxImageHolder());
-            container.Bind<MainForm>().ToSelf();
 
             return container;
         }
@@ -112,6 +110,13 @@ namespace FractalPainting.App
 
     public class DragonFractalAction : IUiAction
     {
+        private readonly Lazy<DragonPainter> _dragonPainter;
+
+        public DragonFractalAction(Lazy<DragonPainter> dragonPainter)
+        {
+            _dragonPainter = dragonPainter;
+        }
+
         public MenuCategory Category => MenuCategory.Fractals;
         public string Name => "Дракон";
         public string Description => "Дракон Хартера-Хейтуэя";
@@ -122,8 +127,8 @@ namespace FractalPainting.App
             // редактируем настройки:
             SettingsForm.For(dragonSettings).ShowDialog();
             // создаём painter с такими настройками
-            var painter = new DragonPainter(Services.GetImageHolder(), dragonSettings);
-            painter.Paint();
+            _dragonPainter.Value.SetSettings(dragonSettings);
+            _dragonPainter.Value.Paint();
         }
 
         private static DragonSettings CreateRandomSettings()
@@ -134,7 +139,7 @@ namespace FractalPainting.App
 
     public class KochFractalAction : IUiAction
     {
-        private Lazy<KochPainter> _kochPainter;
+        private readonly Lazy<KochPainter> _kochPainter;
 
         public KochFractalAction(Lazy<KochPainter> kochPainter)
         {
@@ -154,7 +159,7 @@ namespace FractalPainting.App
     public class DragonPainter
     {
         private readonly IImageHolder imageHolder;
-        private readonly DragonSettings settings;
+        private DragonSettings settings;
         private readonly float size;
         private Size imageSize;
 
@@ -191,6 +196,11 @@ namespace FractalPainting.App
                 }
             }
             imageHolder.UpdateUi();
+        }
+
+        public void SetSettings(DragonSettings settings)
+        {
+            this.settings = settings;
         }
     }
 }
