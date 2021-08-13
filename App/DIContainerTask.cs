@@ -25,6 +25,7 @@ namespace FractalPainting.App
             var container = new StandardKernel();
 
             container.Bind<IUiAction>().To<KochFractalAction>();
+            container.Bind<KochPainter>().ToSelf();
             container.Bind<IUiAction>().To<DragonFractalAction>();
 
             container.Bind<IUiAction>().To<SaveImageAction>();
@@ -38,6 +39,7 @@ namespace FractalPainting.App
             container.Bind<Palette>().ToConstant(Services.GetPalette());
 
             container.Bind<PictureBoxImageHolder>().ToConstant(Services.GetPictureBoxImageHolder());
+            container.Bind<MainForm>().ToSelf();
 
             return container;
         }
@@ -132,14 +134,20 @@ namespace FractalPainting.App
 
     public class KochFractalAction : IUiAction
     {
+        private Lazy<KochPainter> _kochPainter;
+
+        public KochFractalAction(Lazy<KochPainter> kochPainter)
+        {
+            _kochPainter = kochPainter;
+        }
+
         public MenuCategory Category => MenuCategory.Fractals;
         public string Name => "Кривая Коха";
         public string Description => "Кривая Коха";
 
         public void Perform()
         {
-            var painter = new KochPainter(Services.GetImageHolder(), Services.GetPalette());
-            painter.Paint();
+            _kochPainter.Value.Paint();
         }
     }
 
