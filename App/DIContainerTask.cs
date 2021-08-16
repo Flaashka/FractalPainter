@@ -8,6 +8,7 @@ using FractalPainting.Infrastructure.UiActions;
 using Ninject;
 using Ninject.Extensions.Factory;
 using Ninject.Extensions.Conventions;
+// ReSharper disable CommentTypo
 
 namespace FractalPainting.App
 {
@@ -29,15 +30,14 @@ namespace FractalPainting.App
 
             container.Bind<IUiAction>().To<SaveImageAction>();
             container.Bind<AppSettings>().ToConstant(Services.GetAppSettings());
-            container.Bind<IImageHolder>().ToConstant(Services.GetImageHolder());
 
             container.Bind<IUiAction>().To<ImageSettingsAction>();
             container.Bind<ImageSettings>().ToConstant(Services.GetImageSettings());
 
             container.Bind<IUiAction>().To<PaletteSettingsAction>();
-            container.Bind<Palette>().ToConstant(Services.GetPalette());
+            container.Bind<Palette>().To<Palette>().InSingletonScope();
 
-            container.Bind<PictureBoxImageHolder>().ToConstant(Services.GetPictureBoxImageHolder());
+            container.Bind<IImageHolder, PictureBoxImageHolder>().To<PictureBoxImageHolder>().InSingletonScope();
 
             return container;
         }
