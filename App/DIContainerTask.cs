@@ -38,6 +38,7 @@ namespace FractalPainting.App
             container.Bind<Palette>().To<Palette>().InSingletonScope();
 
             container.Bind<IImageHolder, PictureBoxImageHolder>().To<PictureBoxImageHolder>().InSingletonScope();
+            container.Bind<IDragonPainterFactory>().ToFactory();
 
             return container;
         }
@@ -108,13 +109,18 @@ namespace FractalPainting.App
         }
     }
 
+    public interface IDragonPainterFactory
+    {
+        DragonPainter CreateDragonPainter(DragonSettings settings);
+    }
+
     public class DragonFractalAction : IUiAction
     {
-        private readonly Lazy<DragonPainter> _dragonPainter;
+        private readonly IDragonPainterFactory _dragonPainterFactory;
 
-        public DragonFractalAction(Lazy<DragonPainter> dragonPainter)
+        public DragonFractalAction(IDragonPainterFactory dragonPainterFactory)
         {
-            _dragonPainter = dragonPainter;
+            _dragonPainterFactory = dragonPainterFactory;
         }
 
         public MenuCategory Category => MenuCategory.Fractals;
@@ -127,8 +133,8 @@ namespace FractalPainting.App
             // редактируем настройки:
             SettingsForm.For(dragonSettings).ShowDialog();
             // создаём painter с такими настройками
-            _dragonPainter.Value.SetSettings(dragonSettings);
-            _dragonPainter.Value.Paint();
+            var dragonPainter = _dragonPainterFactory.CreateDragonPainter(dragonSettings);
+            dragonPainter.Paint();
         }
 
         private static DragonSettings CreateRandomSettings()
@@ -198,7 +204,7 @@ namespace FractalPainting.App
             imageHolder.UpdateUi();
         }
 
-        public void SetSettings(DragonSettings settings)
+        private void SetSettings(DragonSettings settings)
         {
             this.settings = settings;
         }
