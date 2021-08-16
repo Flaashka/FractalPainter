@@ -28,14 +28,14 @@ namespace FractalPainting.App
             container.Bind<IUiAction>().To<KochFractalAction>();
             container.Bind<IUiAction>().To<DragonFractalAction>();
 
-            container.Bind<IObjectSerializer>().To<XmlObjectSerializer>();
-            container.Bind<IBlobStorage>().To<FileBlobStorage>();
+            container.Bind<IObjectSerializer>().To<XmlObjectSerializer>().WhenInjectedInto<SettingsManager>();
+            container.Bind<IBlobStorage>().To<FileBlobStorage>().WhenInjectedInto<SettingsManager>();
             container.Bind<AppSettings>().ToMethod(context => context.Kernel.Get<SettingsManager>().Load()).InSingletonScope();
 
             container.Bind<IUiAction>().To<SaveImageAction>();
 
             container.Bind<IUiAction>().To<ImageSettingsAction>();
-            container.Bind<ImageSettings>().ToConstant(Services.GetImageSettings());
+            container.Bind<ImageSettings>().ToMethod(context => context.Kernel.Get<AppSettings>().ImageSettings).InSingletonScope();
 
             container.Bind<IUiAction>().To<PaletteSettingsAction>();
             container.Bind<Palette>().To<Palette>().InSingletonScope();
